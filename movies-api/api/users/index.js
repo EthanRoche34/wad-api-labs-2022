@@ -23,8 +23,17 @@ router.post(
       return next();
     }
     if (req.query.action === "register") {
-      await User.create(req.body);
-      res.status(201).json({ code: 201, msg: "Successful created new user." });
+      const regex = new RegExp("^(?=.*[A-Za-z])(?=.*d)[A-Za-zd]{5,}$");
+      if (regex.test(req.body.password) === false) {
+        await User.create(req.body);
+        res
+          .status(201)
+          .json({ code: 201, msg: "Successful created new user." });
+      } else {
+        res
+          .status(401)
+          .json({ code: 401, msg: "Password does not follow required format" });
+      }
     } else {
       const user = await User.findByUserName(req.body.username);
       if (!user)
@@ -71,9 +80,14 @@ router.post(
     const userName = req.params.userName;
     const movie = await movieModel.findByMovieDBId(newFavourite);
     const user = await User.findByUserName(userName);
-    await user.favourites.push(movie._id);
+    const movieRegex = new RegExp(movie._id);
+    if (movieRegex.test(user.favourites) == false) {
+      await user.favourites.push(movie._id);
+      res.status(201).json(user);
+    } else {
+      res.status(404).json({ msg: "Movie is in favourites already" });
+    }
     await user.save();
-    res.status(201).json(user);
   })
 );
 
