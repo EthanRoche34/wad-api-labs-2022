@@ -56,7 +56,7 @@ router.post(
   })
 );
 
-// Update a user
+// Update a User
 router.put("/:id", async (req, res) => {
   if (req.body._id) delete req.body._id;
   const result = await User.updateOne(
