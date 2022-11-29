@@ -23,8 +23,8 @@ router.post(
       return next();
     }
     if (req.query.action === "register") {
-      const regex = new RegExp("^(?=.*[A-Za-z])(?=.*d)[A-Za-zd]{5,}$");
-      if (regex.test(req.body.password) === false) {
+      const regex = new RegExp(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$/);
+      if (req.body.password.match(regex)) {
         await User.create(req.body);
         res
           .status(201)
